@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de Nuvem de Palavras</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        input[type="file"] {
+            display: none;
+        }
+        .custom-file-upload {
+            border: 1px solid #ccc;
+            display: inline-block;
+            padding: 6px 12px;
+            cursor: pointer;
+        }
+        #nuvem_palavras img {
+            max-width: 100%;
+            height: auto;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Gerador de Nuvem de Palavras</h1>
+    <form id="formulario" enctype="multipart/form-data">
+        <label for="pdf" class="custom-file-upload">
+            Selecionar Arquivo PDF
+        </label>
+        <input type="file" id="pdf" name="pdf" accept=".pdf" required>
+        <br>
+        <label for="conectivos">Conectivos (separados por vírgula):</label>
+        <input type="text" id="conectivos" name="conectivos">
+        <br>
+        <button type="submit">Gerar Nuvem de Palavras</button>
+    </form>
+    <div id="nuvem_palavras"></div>
+
+    <script>
+        document.getElementById('pdf').addEventListener('change', function(event) {
+            var fileName = event.target.files[0].name;
+            var label = document.querySelector('.custom-file-upload');
+            label.innerHTML = 'Arquivo Selecionado: ' + fileName;
+        });
+
+        document.getElementById('formulario').addEventListener('submit', function(event) {
+            event.preventDefault();
+            var formData = new FormData(this);
+            var conectivos = document.getElementById('conectivos').value;
+            formData.append('conectivos', conectivos);
+            fetch('/gerar_nuvem', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.blob())
+            .then(blob => {
+                var imageUrl = URL.createObjectURL(blob);
+                document.getElementById('nuvem_palavras').innerHTML = '<img src="' + imageUrl + '">';
+            });
+        });
+    </script>
+</body>
+</html>
